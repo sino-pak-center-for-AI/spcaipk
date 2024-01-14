@@ -1,4 +1,4 @@
-# 1. Building Hermes
+## 1. Building Hermes
 
 There are several ways to obtain a working Hermes installation. Information on
 dependencies can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md).
