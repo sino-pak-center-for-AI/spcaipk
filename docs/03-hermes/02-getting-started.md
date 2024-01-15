@@ -55,7 +55,7 @@ view of data in the directory. In a supercomputing site, this would typically be
 in your home directory.
 
 ```bash
-jarvis init ${CONFIG_DIR} ${PRIVATE_DIR} ${SHARED_DIR}
+jarvis init [CONFIG_DIR] [PRIVATE_DIR] [SHARED_DIR]
 ```
 
 ### 2.3. Build a Resource Graph
