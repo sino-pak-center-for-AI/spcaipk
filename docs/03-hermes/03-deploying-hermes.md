@@ -196,7 +196,7 @@ $(jarvis path +shared)/hermes_run/hermes_server.yaml
 $(jarvis path +shared)/hermes_run/hermes_client.yaml
 ```
 
-## Starting + Stopping Hermes
+### Starting + Stopping Hermes
 
 To start Hermes:
 
@@ -204,7 +204,7 @@ To start Hermes:
 jarvis pipeline start
 ```
 
-## Stopping and Killing Hermes
+### Stopping and Killing Hermes
 
 To gracefully stop Hermes and flush data back to the PFS:
 
@@ -218,7 +218,7 @@ To kill a Hermes deployment that isn't stopping gracefully:
 jarvis pipeline kill
 ```
 
-## Cleanup
+### Cleanup
 
 To erase data produced by the pipeline:
 
