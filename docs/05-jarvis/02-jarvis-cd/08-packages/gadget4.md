@@ -20,26 +20,8 @@ spack load hdf5@1.14.1 gsl@2.1 fftw@3+mpi
 scspkg create gadget4
 cd $(scspkg pkg src gadget4)
 git clone https://gitlab.mpcdf.mpg.de/vrs/gadget4
-cd gadget2
+cd gadget4
 mkdir build
 cd build
 
-```
-
-## Manual Gassphere Example
-
-Compile:
-```bash
-cmake ../ \
--DPEANOHILBERT=ON \
--DWALLCLOCK=ON \
--DSYNCHRONIZATION=ON
-make -j8
-```
-
-Run:
-```bash
-cd ../
-mkdir gassphere
-build/bin/Gadget2 Gadget2/parameterfiles/gassphere.param
 ```

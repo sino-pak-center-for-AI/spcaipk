@@ -1,22 +1,4 @@
-## 1. Building Hermes
-
-There are several ways to obtain a working Hermes installation. Information on
-dependencies can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md).
-
-- [Docker Image](https://hub.docker.com/r/hdfgroup/hermes)
-  - We also maintain Dockerfiles for [Hermes
-    development](https://github.com/HDFGroup/hermesblob/master/dev.Dockerfile) and [Hermes
-    dependencies](https://github.com/HDFGroup/hermes/blob/master/docker/deps.Dockerfile)
-- CMake
-  - Instructions can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md)
-- Spack
-  - Instructions can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md)
-
-If you get stuck, the root of the repository contains a `ci` folder where we
-keep the scripts we use to build and test Hermes in a Github Actions workflow.
-The workflow file itself is [here](https://github.com/HDFGroup/hermes/blob/master/.github/workflows/main.yml).
-
-## 2. Configuring + Deploying Hermes
+## Configuring + Deploying Hermes
 
 The Hermes daemon is responsible for tracking various metadata, and it is
 required to be launched before your application. There should only be
@@ -28,17 +10,17 @@ that Hermes expects in order for applications to be deployed. We have
 also integrated several applications into Jarvis that can be seamlessly
 deployed with Hermes.
 
-### 2.1. Install Jarvis
+### Install Jarvis
 
 To install jarvis, do the following:
 ```bash
 export JARVIS_PATH=${PWD}/jarvis-cd
 git clone https://github.com/grc-iit/jarvis-cd.git ${JARVIS_PATH}
 cd ${JARVIS_PATH}
-pip install -e . -r requirements.txt
+pip install -e .
 ```
 
-### 2.2. Initialize Jarvis
+### Initialize Jarvis
 
 After installing, Jarvis MUST be configured for your specific system. The first
 step is to define places for storing Jarvis configuration data. Note that large data
@@ -54,16 +36,17 @@ would be an example.
 view of data in the directory. In a supercomputing site, this would typically be
 in your home directory.
 
+Make sure that all these paths are absolute paths.
 ```bash
 jarvis init [CONFIG_DIR] [PRIVATE_DIR] [SHARED_DIR]
 ```
 
-### 2.3. Build a Resource Graph
+### Build a Resource Graph
 
 A resource graph contains the storage and networking configuration
 of the machines you intend to deploy Hermes on.
 
-#### 2.3.1. Bootstrapping from an existing machine
+#### Bootstrapping from an existing machine
 
 We have several resource graphs for different machines, located under
 ``${JARVIS_PATH}/builtin/resource_graph``. There are resource graphs
@@ -84,7 +67,7 @@ For example, ares is one of the machines:
 jarvis bootstrap from ares
 ```
 
-#### 2.3.2. Building a new resource graph
+#### Building a new resource graph
 
 If a resource graph for your machine is not available, you will have to
 define one manually.
@@ -112,10 +95,24 @@ net:
   shared: false          # Is this network shared across nodes. E.g., localhost is not
   speed: 40G
 ```
-This information can be discovered using tools such as ``fi_info`` provided
-by libfabric.
 
-### 2.4. Building an Environment
+This information can be discovered using tools such as ``fi_info`` provided by libfabric. The fi_info tool is extremely verbose and requires some expertise to understand. fi_info outputs several networks -- most of which are irrelevant. Many networks printed may only function in single-node cases -- or not at all.
+* Networks with the **lo** domain or with fabrics equivalent to 127.0.0.1 will only function in single-node cases.
+* Addresses ending with the format \*.0.0.0 will **NOT** work at all. These are *network* addresses, not *host* addreses. For example, 127.0.0.0 comes up sometimes in the fi_info output.
+* Networks where the fabric is not a number are generally irrelevent and will not function when used. For example:
+```yaml
+# This provider is not relevant
+provider: UDP
+fabric: UDP-IP
+domain: udp
+version: 1.1
+type: FI_EP_DGRAM
+protocol: FI_PROTO_UDP
+```
+* One way to filter out dysfunctional fi_info outputs is to use ``ip addr show`` (or ``fi_info | grep fabric``) to list available IP addresses. Do this on two separate machines, compare their output, and then look at only the IP addresses that are similar between the machines. If you can ssh between the machines using these IP addresses, then you should focus on only those fabrics matching their pattern in the fi_info output
+* Be careful about the providers. It has come up plenty of times where a provider is listed, but doesn't actually work. Verbs, for example, may fail if your Hermes installation was not correctly configured to support RDMA. This is a guess-and-check game. TCP and Sockets are generally a safe bet. It may be of benefit to try just these providers and get a distributed deployment of Hermes functioning before moving on to verbs.
+
+### Building an Environment
 
 We will now load all necessary environment variables and build a
 Jarvis environment named hermes_env:
@@ -125,9 +122,10 @@ jarvis env build hermes_env
 ```
 
 hermes_env will store all important environment variables, including PATH,
-LD_LIBRARY_PATH, etc. in a YAML file.
+LD_LIBRARY_PATH, etc. in a YAML file. This will make it so that you do not
+need to repeatedly run spack load and module load if the machine is broken.
 
-### 2.5. Set the active Hostfile
+### Set the active Hostfile
 
 The hostfile contains the set of nodes that the pipeline will run over.
 This is structured the same way as a traditional MPI hostfile.
@@ -149,20 +147,20 @@ pipeline. Jarvis does not automatically detect changes to this file.
 jarvis pipeline update
 ```
 
-#### 2.6. Create an empty pipeline:
+#### Create an empty pipeline:
 ```bash
 jarvis pipeline create hermes
 ```
 hermes is the name of the pipeline. It doesn't need to be hermes,
 it can be any name.
 
-#### 2.7. Copy the environment cache:
+#### Copy the environment cache:
 ```bash
 jarvis pipeline env copy hermes_env
 ```
 This will use the hermes_env environment that was previously created in
 
-#### 2.8. Add Hermes runtime
+#### Add Hermes runtime
 
 ```bash
 jarvis pipeline append hermes_run
@@ -180,14 +178,14 @@ $(jarvis path +shared)/hermes_run/hermes_server.yaml
 $(jarvis path +shared)/hermes_run/hermes_client.yaml
 ```
 
-## 2.9. Starting + Stopping Hermes
+## Starting + Stopping Hermes
 
 To start Hermes:
 ```bash
 jarvis pipeline start
 ```
 
-## 2.10. Stopping and Killing Hermes
+## Stopping and Killing Hermes
 
 To gracefully stop Hermes and flush data back to the PFS:
 ```bash
@@ -199,7 +197,7 @@ To kill a Hermes deployment that isn't stopping gracefully:
 jarvis pipeline kill
 ```
 
-## 2.11. Cleanup
+## Cleanup
 
 To erase data produced by the pipeline:
 ```bash
@@ -211,14 +209,14 @@ To destroy the pipeline:
 jarvis pipeline destroy
 ```
 
-## 3. Configuring + Deploying Hermes with an Application
+## 2. Configuring + Deploying Hermes with an Application
 
 As previously stated, Jarvis can be used to deploy and application
 with Hermes. This will automatically set environment variables
 (e.g., LD_PRELOAD) that will be necessary for the application to
 run.
 
-### 3.1. Build an Environment
+### 2.1. Build an Environment
 
 We will now load all necessary environment variables and build a
 Jarvis environment named hermes_env:
@@ -231,22 +229,22 @@ jarvis env build hermes_ior_env
 hermes_ior_env will store all important environment variables, including PATH,
 LD_LIBRARY_PATH, etc. in a YAML file.
 
-### 3.2. Create an empty pipeline:
+### 2.2. Create an empty pipeline:
 ```bash
 jarvis pipeline create hermes_ior
 ```
 
-### 3.3. Copy the environment cache:
+### 2.3. Copy the environment cache:
 ```bash
 jarvis pipeline env copy hermes_ior_env
 ```
 
-### 3.4. Set the active hostfile
+### 2.4. Set the active hostfile
 ```bash
 jarvis hostfile set /path/to/hostfile
 ```
 
-### 3.5. Add Hermes runtime
+### 2.5. Add Hermes runtime
 
 ```bash
 jarvis pipeline append hermes_run
@@ -258,7 +256,7 @@ include=${HOME}/ior_data
 This will ensure that if a Hermes interceptor is used, it will intercept
 all paths in ``${HOME}/ior_data``.
 
-### 3.6. Add Hermes MPI-IO interceptor
+### 2.6. Add Hermes MPI-IO interceptor
 
 ```bash
 jarvis pipeline append hermes_api
@@ -269,7 +267,7 @@ This will automatically locate the interceptor library by
 traversing various environment variables. This will ensure
 that MPI-IO is intercepted by Hermes.
 
-### 3.7. Add IOR
+### 2.7. Add IOR
 
 ```bash
 jarvis pipeline append ior
@@ -287,7 +285,7 @@ This IOR will perform 1GB of I/O per-process (block) in units of 1m (xfer) and
 produce a single output file ``${HOME}/ior_data/ior.bin``(out) using MPI-IO
 (api). The total amount of I/O performed will be 64GB spread across 4 nodes.
 
-### 3.8. Run the Pipeline
+### 2.8. Run the Pipeline
 
 To run the pipeline:
 ```bash
@@ -301,7 +299,7 @@ jarvis pipeline start
 jarvis pipeline stop
 ```
 
-### 3.9. Cleanup
+### 2.9. Cleanup
 
 The following will delete intermediate data generated by Hermes + IOR:
 ```bash
