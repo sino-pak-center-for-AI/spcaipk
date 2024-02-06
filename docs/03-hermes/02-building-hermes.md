@@ -1,3 +1,5 @@
+# Building Hermes
+
 ## Dependencies
 
 * A C++ compiler that supports C++ 17. GCC 9.4 is the minimum version of GCC
