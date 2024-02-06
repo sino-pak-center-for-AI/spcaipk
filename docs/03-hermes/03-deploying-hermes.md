@@ -1,21 +1,3 @@
-# Building Hermes
-
-There are several ways to obtain a working Hermes installation. Information on
-dependencies can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md).
-
-- [Docker Image](https://hub.docker.com/r/hdfgroup/hermes)
-  - We also maintain Dockerfiles for [Hermes
-    development](https://github.com/HDFGroup/hermesblob/master/dev.Dockerfile) and [Hermes
-    dependencies](https://github.com/HDFGroup/hermes/blob/master/docker/deps.Dockerfile)
-- CMake
-  - Instructions can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md)
-- Spack
-  - Instructions can be found in the [README](https://github.com/HDFGroup/hermes/blob/master/README.md)
-
-If you get stuck, the root of the repository contains a `ci` folder where we
-keep the scripts we use to build and test Hermes in a Github Actions workflow.
-The workflow file itself is [here](https://github.com/HDFGroup/hermes/blob/master/.github/workflows/main.yml).
-
 ## Configuring + Deploying Hermes
 
 The Hermes daemon is responsible for tracking various metadata, and it is
@@ -36,7 +18,7 @@ To install jarvis, do the following:
 export JARVIS_PATH=${PWD}/jarvis-cd
 git clone https://github.com/grc-iit/jarvis-cd.git ${JARVIS_PATH}
 cd ${JARVIS_PATH}
-pip install -e . -r requirements.txt
+pip install -e .
 ```
 
 ### Initialize Jarvis
@@ -56,8 +38,9 @@ There are three places where configuration data is stored:
   view of data in the directory. In a supercomputing site, this would typically be
   in your home directory.
 
+Make sure that all these paths are absolute paths.
 ```bash
-jarvis init ${CONFIG_DIR} ${PRIVATE_DIR} ${SHARED_DIR}
+jarvis init [CONFIG_DIR] [PRIVATE_DIR] [SHARED_DIR]
 ```
 
 ### Build a Resource Graph
@@ -120,8 +103,22 @@ net:
     speed: 40G
 ```
 
-This information can be discovered using tools such as `fi_info` provided
-by libfabric.
+This information can be discovered using tools such as ``fi_info`` provided by libfabric. The fi_info tool is extremely verbose and requires some expertise to understand. fi_info outputs several networks -- most of which are irrelevant. Many networks printed may only function in single-node cases -- or not at all.
+* The most important information to determine a relevant network is domain, fabric, and provider.
+* Networks with the **lo** domain or with fabrics equivalent to 127.0.0.1 will only function in single-node cases.
+* Fabrics ending with the format \*.0.0.0 will **NOT** work. These are *network* addresses, not *host* addreses. For example, 127.0.0.0 comes up sometimes in the fi_info output.
+* Networks where the fabric is not a number are generally irrelevant and will not function when used. For example:
+```yaml
+# This provider is not relevant
+provider: UDP
+fabric: UDP-IP
+domain: udp
+version: 1.1
+type: FI_EP_DGRAM
+protocol: FI_PROTO_UDP
+```
+* One way to filter out dysfunctional fi_info outputs is to use ``ip addr show`` (or ``fi_info | grep fabric``) to list available IP addresses. Do this on two separate machines, compare their output, and then look at only the IP addresses that are similar between the machines. If you can ssh between the machines using these IP addresses, then you should focus on only those fabrics matching their pattern in the fi_info output
+* Be careful about the providers. It has come up plenty of times where a provider is listed, but doesn't actually work. Verbs, for example, may fail if your Hermes installation was not correctly configured to support RDMA. This is a guess-and-check game. TCP and Sockets are generally a safe bet. It may be of benefit to try just these providers and get a distributed deployment of Hermes functioning before moving on to verbs.
 
 ### Building an Environment
 
@@ -134,7 +131,8 @@ jarvis env build hermes_env
 ```
 
 hermes_env will store all important environment variables, including PATH,
-LD_LIBRARY_PATH, etc. in a YAML file.
+LD_LIBRARY_PATH, etc. in a YAML file. This will make it so that you do not
+need to repeatedly run spack load and module load if the machine is broken.
 
 ### Set the active Hostfile
 
