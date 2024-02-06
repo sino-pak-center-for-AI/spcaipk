@@ -217,6 +217,14 @@ cmake ../ -DCMAKE_INSTALL_PREFIX=$(scspkg pkg root hermes_run)
 make -j32 install
 ```
 
+To compile with MPI-IO and VFD interceptors:
+```bash
+cmake ../ \
+-DHERMES_ENABLE_MPIIO_ADAPTER=ON \
+-DHERMES_ENABLE_VFD=ON \
+-DCMAKE_INSTALL_PREFIX=$(scspkg pkg root hermes_run)
+```
+
 There are several options provided in the root Hermes [CMake](https://github.com/HDFGroup/hermes/blob/master/CMakeLists.txt). To view these
 options, one can run run:
 ```bash
