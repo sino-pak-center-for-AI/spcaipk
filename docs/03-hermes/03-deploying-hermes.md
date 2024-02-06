@@ -104,9 +104,10 @@ net:
 ```
 
 This information can be discovered using tools such as ``fi_info`` provided by libfabric. The fi_info tool is extremely verbose and requires some expertise to understand. fi_info outputs several networks -- most of which are irrelevant. Many networks printed may only function in single-node cases -- or not at all.
+* The most important information to determine a relevant network is domain, fabric, and provider.
 * Networks with the **lo** domain or with fabrics equivalent to 127.0.0.1 will only function in single-node cases.
-* Addresses ending with the format \*.0.0.0 will **NOT** work at all. These are *network* addresses, not *host* addreses. For example, 127.0.0.0 comes up sometimes in the fi_info output.
-* Networks where the fabric is not a number are generally irrelevent and will not function when used. For example:
+* Fabrics ending with the format \*.0.0.0 will **NOT** work. These are *network* addresses, not *host* addreses. For example, 127.0.0.0 comes up sometimes in the fi_info output.
+* Networks where the fabric is not a number are generally irrelevant and will not function when used. For example:
 ```yaml
 # This provider is not relevant
 provider: UDP
