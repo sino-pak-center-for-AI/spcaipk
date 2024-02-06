@@ -1,3 +1,5 @@
+# Deploying Hermes
+
 ## Configuring + Deploying Hermes
 
 The Hermes daemon is responsible for tracking various metadata, and it is
