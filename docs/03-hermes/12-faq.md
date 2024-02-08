@@ -2,7 +2,7 @@
 
 ## What is the minimum version for GCC?
 
-GCC 11. Hermes requires C++17 features that are only available since GCC 7.3. C++17 support is enabled by default in GCC 11; it can be explicitly selected in earlier versions with the `-std=c++17` command-line flag or `-std=gnu++17` to enable GNU extensions as well. See [C++17 Support in GCC](https://gcc.gnu.org/projects/cxx-status.html#cxx17) for the details. Use `spack install gcc` first if your system has GCC 4. It will install GCC 12.2.0 by default. Then, run `spack compiler find` to use the newly installed gcc.
+GCC 9.4. C++17 support is enabled by default in GCC 11; it can be explicitly selected in earlier versions with the `-std=c++17` command-line flag or `-std=gnu++17` to enable GNU extensions as well. See [C++17 Support in GCC](https://gcc.gnu.org/projects/cxx-status.html#cxx17) for the details. Use `spack install gcc` first if your system has GCC 4. It will install GCC 12.2.0 by default. Then, run `spack compiler find` to use the newly installed gcc.
 
 ## Can I run Hermes on Mac?
 

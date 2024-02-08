@@ -2,8 +2,7 @@
 
 ## Dependencies
 
-* A C++ compiler that supports C++ 17. GCC 9.4 is the minimum version of GCC
-that Hermes was tested with.
+* A C++ compiler that supports C++ 17. GCC 9.4 is the minimum version of GCC that Hermes was tested with.
 * [Thallium](https://mochi.readthedocs.io/en/latest/installing.html) - RPC library for HPC. Use a version greater than `0.5` for RoCE support.
 * [yaml-cpp](https://github.com/jbeder/yaml-cpp) - YAML file parser
 * [hermes_shm](https://github.com/lukemartinlogan/hermes_shm): A library containing shared-memory data structures, configuration parsing, and various helper utilities
