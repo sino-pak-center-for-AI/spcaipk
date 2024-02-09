@@ -31,8 +31,6 @@ The Hermes repo is organized as follows:
 1. ``benchmark`` includes some performance benchmark kernels
 1. ``ci`` includes all code for continuous integration
 
-We provide more details on how to extend Hermes under the [Components](08-components) sections.
-
 ## Preparing Pull Request (PR)
 
 Please run these two steps and remove all warnings.
