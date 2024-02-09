@@ -1,23 +1,17 @@
-# Quick Start Guide
+# Containers
 
 ```bash
 docker pull hdfgroup/hermes
 docker run -it hdfgroup/hermes
-hermes@6bcfd7679b0a:~$ stage_in
-Usage: mpirun -n [nprocs] ./stage_in [url] [offset] [size] [dpe]
 ```
-
-CAUTION: The image from DockerHub may throw **Illegal Instruction** for Spack-installed binaries.
-See [#483](https://github.com/HDFGroup/hermes/issues/483).
 
 ## Dockerfiles
 
-There are [four Dockerfiles](https://github.com/HDFGroup/hermes/tree/master/docker) at the top level of the Hermes repository.
+There are [two Dockerfiles](https://github.com/HDFGroup/hermes/tree/master/docker) at the top level of the Hermes repository.
 Three Docker images built from these Dockerfiles are available on [Docker Hub](https://hub.docker.com/r/hdfgroup/hermes):
 
+- [`hdfgroup/hermes-deps:latest`](https://hub.docker.com/repository/docker/hdfgroup/hermes-deps) - The Hermes dependencies for developers.
 - [`hdfgroup/hermes:latest`](https://hub.docker.com/repository/docker/hdfgroup/hermes) - Hermes pre-built & ready to go
-- [`hdfgroup/hermes-dev:latest`](https://hub.docker.com/repository/docker/hdfgroup/hermes-dev) - For Hermes developers; it clones Hermes repo.
-- [`hdfgroup/hermes-deps:latest`](https://hub.docker.com/repository/docker/hdfgroup/hermes-deps) - For testers; this is used by the two images above.
 
 Running one of these docker containers usually involves mounting volumes or directories of the host system in the docker container via the `-v` option of the `docker run` command, for example:
 

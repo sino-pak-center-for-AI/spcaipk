@@ -2,7 +2,7 @@
 
 ![Hermes Ecosystem](images/Hermes_Ecosystem.jpg)
 
-Instead of the [Hermes primitives](06-programming.md), existing applications
+Instead of the [Hermes primitives](07-programming.md), existing applications
 use I/O libraries and middleware such as the C standard I/O library,
 MPI-IO, or HDF5. Since Hermes is intended to be a seamless I/O
 buffering solution, a set of _adapters_ is provided in the form of
@@ -42,12 +42,9 @@ Currently, we have four filesystem adapters:
 When reading/writing to a file, the FSBC will divide the I/O request into
 fixed-size pages. This is a configurable value, but the default is 1MB.
 
-When extending the size of a file, the FSBC relies on a lock to ensure that
-the size of the file is coherent. This lock is a problem for workloads which
-perform shared I/O to a single file. FPP workloads are generally better.
-
-A solution to this problem would be a log-structured merge tree, but this
-will require significant changes to the Hermes data model.
+As opposed to locking, Hermes uses queuing to ensure that I/O to the same regions
+of a file are strongly consistent. I/O to the same blob will be placed in the
+same queue, ensuring sequencing.
 
 ### VFD
 

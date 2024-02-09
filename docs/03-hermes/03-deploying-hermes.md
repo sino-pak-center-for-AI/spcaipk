@@ -31,18 +31,22 @@ objects are **never** intended to be stored in these directories.
 
 There are three places where configuration data is stored:
 
-- CONFIG_DIR: A directory where jarvis metadata for pkgs and pipelines are stored. This
-  directory can be anywhere that the current user can access.
-- PRIVATE_DIR: A directory which is common across all machines, but stores data locally to the
-  machine. Some jarvis pkgs require certain data to be stored per-machine. /tmp
-  would be an example.
-- SHARED_DIR: A directory which is common across all machines, where each machine has the same
+- **CONFIG_DIR:** A directory where jarvis metadata for pkgs and pipelines are stored. This
+  directory can be anywhere that the current user can access. ``${HOME}/jarvis_config`` would be an example.
+- **PRIVATE_DIR:** A directory which is common across all machines, but stores data locally to the
+  machine. Some jarvis pkgs require certain data to be stored per-machine. ``/tmp/jarvis_priv`` would be an example.
+- **SHARED_DIR:** A directory which is common across all machines, where each machine has the same
   view of data in the directory. In a supercomputing site, this would typically be
-  in your home directory.
+  in your home directory. For example ``${HOME}/jarvis_shared``
 
-Make sure that all these paths are absolute paths.
+Make sure that all these paths are absolute paths. Environment variables can be used to make absolute paths less cumbersome. This command will automatically create the directories if they don't exist.
 ```bash
 jarvis init [CONFIG_DIR] [PRIVATE_DIR] [SHARED_DIR]
+```
+
+This above command produces the jarvis configuration and store it here:
+```bash
+${JARVIS_PATH}/config/jarvis_config.yaml
 ```
 
 ### Build a Resource Graph
@@ -191,9 +195,14 @@ Jarvis will automatically produce a Hermes client and server configuration that
 contains all storage devices and fastest available network defined in the
 resource graph. These configurations will be located in:
 
-```
+```bash
 $(jarvis path +shared)/hermes_run/hermes_server.yaml
 $(jarvis path +shared)/hermes_run/hermes_client.yaml
+```
+
+To view all parameters of the Hermes package, you can run:
+```bash
+jarvis pkg help hermes_run
 ```
 
 ### Starting + Stopping Hermes
@@ -294,6 +303,11 @@ This will automatically locate the interceptor library by
 traversing various environment variables. This will ensure
 that MPI-IO is intercepted by Hermes.
 
+hermes_api includes other interceptors that can be used: posix, stdio, vfd. To view the set of options:
+```bash
+jarvis pkg help hermes_run
+```
+
 ### Add IOR
 
 ```bash
@@ -341,9 +355,11 @@ jarvis pipeline clean
 ### Resource Graph Misconfiguration
 
 Commonly, the cause is a misconfiguration in the resource graph, specifically
-with the network section. Make sure that the domain, provider, and fabric
-are valid. To view the Hermes configuration to see which network was selected
-from your resource graph, you can run:
+with the network section. If the resource graph is misconfigured, Hermes may
+crash with a ``mercury->fatal`` error and ultimately cause the program to stall
+forever. Make sure that the domain, provider, and fabric are valid. To view the
+Hermes configuration to see which network was selected from your resource graph,
+you can run:
 
 ```bash
 cat $(jarvis path)/hermes_run/hermes_server.yaml
