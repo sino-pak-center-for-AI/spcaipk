@@ -3,6 +3,32 @@ import { ProjectId, Publication, PublicationTag } from "../types";
 const publications: Publication[] = [
   {
     authors: [
+      "J. Cernuda",
+      "L. Logan",
+      "A. Gainaru",
+      "J. Lofstead",
+      "A. Kougkas",
+      "X.-H. Sun",
+    ],
+    title:
+      "Hades: A Context-Aware Active Storage Framework for Accelerating Large-Scale Data Analysis",
+    venue:
+      "The 24th IEEE/ACM international Symposium on Cluster, Cloud and Internet Computing (CCGRID 2024)",
+    type: "Conference",
+    date: "May, 2024",
+    tags: [
+      "Active Storage",
+      "Hierarchical Storage",
+      "Context Awareness",
+      "Metadata Management",
+      "Data Operator",
+      "In-Transit Computing",
+      "Coeus",
+    ],
+    links: {},
+  },
+  {
+    authors: [
       "N. Rajesh",
       "K. Bateman",
       "S. Byna",
